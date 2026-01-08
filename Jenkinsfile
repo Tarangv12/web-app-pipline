@@ -1,5 +1,5 @@
  pipeline {
-    agent any 
+    agent ani
 
     options {
         timeout(time: 5, unit: 'MINUTES')
