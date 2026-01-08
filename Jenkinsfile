@@ -1,25 +1,22 @@
-pipeline {
+ pipeline {
     agent any 
 
-    // Safety settings from your notes (Page 7)
     options {
-        timeout(time: 5, unit: 'MINUTES')   // Stops the build if it freezes [cite: 150]
-        timestamps()                        // Shows the time in logs [cite: 66]
+        timeout(time: 5, unit: 'MINUTES')
+        timestamps()
     }
 
     stages {
         stage('Initialize') {
             steps {
-                // Deletes old files so you start fresh [cite: 63]
-                cleanWs() 
-                echo 'Workspace cleaned. Ready to start.'
+                echo 'Starting Pipeline...'
+                // REMOVED cleanWs() from here so we don't delete the code!
             }
         }
 
         stage('Build') {
             steps {
                 echo 'Building the application...'
-                // 'bat' is the command for Windows (Linux uses 'sh')
                 bat 'echo Build Phase Complete' 
             }
         }
@@ -27,18 +24,24 @@ pipeline {
         stage('Test') {
             steps {
                 echo 'Running Python Tests...'
-                // Runs your python script using Windows Batch command
+                // Now this will find the file because we didn't delete it
                 bat 'python app.py' 
             }
         }
     }
 
+    // This section runs AFTER the build is finished
     post {
-        failure {
-            echo 'ERROR: The build failed.'
+        always {
+            // Clean the workspace now that we are done
+            cleanWs()
+            echo 'Workspace cleaned up after build.'
         }
         success {
-            echo 'SUCCESS: The pipeline finished correctly.'
+            echo 'SUCCESS: Pipeline finished correctly!'
+        }
+        failure {
+            echo 'ERROR: The build failed.'
         }
     }
 }
